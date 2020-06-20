@@ -77,7 +77,14 @@ class TycoonTest {
             add(vehicleName = "Ship", vehicleType = Ship, at = Port)
         }
 
-        val deliveryPlan = "ABBBABAAABBB".parseToDeliveryPlan()
+        val deliveryPlan = deliveryPlan {
+            deliver(cargo = A, from = Factory, to = WarehouseA)
+            deliver(cargo = B, from = Factory, to = WarehouseB)
+            deliver(cargo = B, from = Factory, to = WarehouseB)
+            deliver(cargo = A, from = Factory, to = WarehouseA)
+            deliver(cargo = B, from = Factory, to = WarehouseB)
+        }
+        
         val events = deliverCargo(deliveryPlan, fleet, deliveryNetwork)
 
         // When
