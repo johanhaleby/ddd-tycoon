@@ -30,8 +30,8 @@ data class Vehicle(val name: VehicleName, val type: VehicleType)
 data class Leg(val requiredVehicleType: VehicleType, val from: Location, val to: Location, val duration: Hours)
 
 class DeliveryRoute internal constructor(internal val legs: MutableList<Leg>) {
-    fun leg(requiredVehicleType: VehicleType, from: Location, to: Location, duration: Hours) {
-        legs.add(Leg(requiredVehicleType, from, to, duration))
+    fun leg(requiredVehicleType: VehicleType, from: Location, to: Location, durationHours: Hours) {
+        legs.add(Leg(requiredVehicleType, from, to, durationHours))
     }
 }
 

@@ -24,11 +24,11 @@ class TycoonTest {
         // Given
         val deliveryNetwork = deliveryNetwork {
             route {
-                leg(requiredVehicleType = Truck, from = Factory, to = Port, duration = 1)
-                leg(requiredVehicleType = Ship, from = Port, to = WarehouseA, duration = 4)
+                leg(requiredVehicleType = Truck, from = Factory, to = Port, durationHours = 1)
+                leg(requiredVehicleType = Ship, from = Port, to = WarehouseA, durationHours = 4)
             }
             route {
-                leg(requiredVehicleType = Truck, from = Factory, to = WarehouseB, duration = 5)
+                leg(requiredVehicleType = Truck, from = Factory, to = WarehouseB, durationHours = 5)
             }
         }
 
@@ -63,11 +63,11 @@ class TycoonTest {
         // Given
         val deliveryNetwork = deliveryNetwork {
             route {
-                leg(requiredVehicleType = Truck, from = Factory, to = Port, duration = 1)
-                leg(requiredVehicleType = Ship, from = Port, to = WarehouseA, duration = 4)
+                leg(requiredVehicleType = Truck, from = Factory, to = Port, durationHours = 1)
+                leg(requiredVehicleType = Ship, from = Port, to = WarehouseA, durationHours = 4)
             }
             route {
-                leg(requiredVehicleType = Truck, from = Factory, to = WarehouseB, duration = 5)
+                leg(requiredVehicleType = Truck, from = Factory, to = WarehouseB, durationHours = 5)
             }
         }
 
