@@ -53,8 +53,8 @@ class DeliveryNetwork private constructor(internal val routes: MutableList<Deliv
 }
 
 class Fleet private constructor(internal val vehicleLocations: MutableMap<Vehicle, Location>) {
-    fun add(vehicleName: VehicleName, vehicleType: VehicleType, at: Location) {
-        vehicleLocations[Vehicle(vehicleName, vehicleType)] = at
+    fun vehicle(name: VehicleName, type: VehicleType, at: Location) {
+        vehicleLocations[Vehicle(name, type)] = at
     }
 
     companion object {

@@ -33,9 +33,9 @@ class TycoonTest {
         }
 
         val fleet = fleet {
-            add(vehicleName = "A", vehicleType = Truck, at = Factory)
-            add(vehicleName = "B", vehicleType = Truck, at = Factory)
-            add(vehicleName = "Ship", vehicleType = Ship, at = Port)
+            vehicle(name = "A", type = Truck, at = Factory)
+            vehicle(name = "B", type = Truck, at = Factory)
+            vehicle(name = "Ship", type = Ship, at = Port)
         }
 
         val deliveryPlan = cargosToDeliverAsString.parseToDeliveryPlan()
@@ -72,9 +72,9 @@ class TycoonTest {
         }
 
         val fleet = fleet {
-            add(vehicleName = "A", vehicleType = Truck, at = Factory)
-            add(vehicleName = "B", vehicleType = Truck, at = Factory)
-            add(vehicleName = "Ship", vehicleType = Ship, at = Port)
+            vehicle(name = "A", type = Truck, at = Factory)
+            vehicle(name = "B", type = Truck, at = Factory)
+            vehicle(name = "Ship", type = Ship, at = Port)
         }
 
         val deliveryPlan = deliveryPlan {
