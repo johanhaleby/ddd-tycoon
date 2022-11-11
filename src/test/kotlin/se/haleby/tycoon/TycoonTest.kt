@@ -19,7 +19,7 @@ import se.haleby.tycoon.VehicleType.Truck
 class TycoonTest {
 
     @ParameterizedTest
-    @CsvSource("A,5", "AB,5", "BB,5", "ABB,7", "AABABBAB,29", "ABBBABAAABBB,41")
+    @CsvSource("A,5", "AB,5", "BB,5", "ABB,7", "AABBA,21", "AABABBAB,29", "ABBBABAAABBB,41")
     fun `history is returned when delivering cargo`(cargosToDeliverAsString: String, expectedTimeString: String) {
         // Given
         val deliveryNetwork = deliveryNetwork {
