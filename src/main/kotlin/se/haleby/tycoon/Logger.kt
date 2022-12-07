@@ -36,7 +36,7 @@ private val Cargo.id
         B -> 1
     }
 
-private fun Location.serialize() = toString().toUpperCase()
+private fun Location.serialize() = toString().uppercase()
 
 // public
 fun generateLogFromEvents(domainEvents: List<DomainEvent>): List<String> {
