@@ -89,15 +89,15 @@ class DeliveryPlan private constructor(internal val cargoDeliveries: MutableList
     override fun toString(): String = "DeliveryPlan(deliveries=$cargoDeliveries)"
 }
 
-sealed class DomainEvent {
-    data class VehicleDeparted(val cargo: Cargo, val vehicle: Vehicle, val from: Location, val to: Location, val elapsedTime: Hours, val estimatedTimeForThisLeg: Hours) : DomainEvent()
-    data class VehicleArrived(val cargo: Cargo, val vehicle: Vehicle, val from: Location, val to: Location, val elapsedTime: Hours, val elapsedTimeForThisLeg: Hours) : DomainEvent()
-    data class VehicleStartedWaitingForCargo(val vehicle: Vehicle, val at: Location) : DomainEvent()
-    data class VehicleStoppedWaitingForCargo(val vehicle: Vehicle, val at: Location) : DomainEvent()
-    data class CargoDeliveryStarted(val cargo: Cargo, val origin: Location, val destination: Location, val elapsedTime: Hours) : DomainEvent()
-    data class CargoWasDeliveredToDestination(val cargo: Cargo, val vehicle: Vehicle, val origin: Location, val destination: Location, val elapsedTime: Hours) : DomainEvent()
-    data class AllCargoHasBeenDelivered(val elapsedTime: Hours) : DomainEvent()
-    data class TimeElapsed(val time: Hours) : DomainEvent()
+sealed interface DomainEvent {
+    data class VehicleDeparted(val cargo: Cargo, val vehicle: Vehicle, val from: Location, val to: Location, val elapsedTime: Hours, val estimatedTimeForThisLeg: Hours) : DomainEvent
+    data class VehicleArrived(val cargo: Cargo, val vehicle: Vehicle, val from: Location, val to: Location, val elapsedTime: Hours, val elapsedTimeForThisLeg: Hours) : DomainEvent
+    data class VehicleStartedWaitingForCargo(val vehicle: Vehicle, val at: Location) : DomainEvent
+    data class VehicleStoppedWaitingForCargo(val vehicle: Vehicle, val at: Location) : DomainEvent
+    data class CargoDeliveryStarted(val cargo: Cargo, val origin: Location, val destination: Location, val elapsedTime: Hours) : DomainEvent
+    data class CargoWasDeliveredToDestination(val cargo: Cargo, val vehicle: Vehicle, val origin: Location, val destination: Location, val elapsedTime: Hours) : DomainEvent
+    data class AllCargoHasBeenDelivered(val elapsedTime: Hours) : DomainEvent
+    data class TimeElapsed(val time: Hours) : DomainEvent
 }
 
 // Use cases
@@ -128,32 +128,32 @@ fun deliverCargo(deliveryPlan: DeliveryPlan, fleet: Fleet, deliveryNetwork: Deli
 }
 
 // Internal
-private sealed class VehicleActivity {
+private sealed interface VehicleActivity {
 
-    sealed class EnRouteVehicleActivity : VehicleActivity() {
-        abstract val from: Location
-        abstract val to: Location
-        abstract val elapsedTime: Hours
-        abstract val legTime: Hours
+    sealed interface EnRouteVehicleActivity : VehicleActivity {
+        val from: Location
+        val to: Location
+        val elapsedTime: Hours
+        val legTime: Hours
 
         val remainingTime: Hours get() = legTime - elapsedTime
         fun hasArrived(): Boolean = remainingTime == 0
         fun hasArrivedTo(location: Location) = to == location
 
-        data class DeliveringCargo(val cargo: Cargo, override val from: Location, override val to: Location, override val legTime: Hours, override val elapsedTime: Hours = 0) : EnRouteVehicleActivity() {
+        data class DeliveringCargo(val cargo: Cargo, override val from: Location, override val to: Location, override val legTime: Hours, override val elapsedTime: Hours = 0) : EnRouteVehicleActivity {
             fun continueRoute(): DeliveringCargo = copy(elapsedTime = elapsedTime.inc())
         }
 
-        data class Returning(override val from: Location, override val to: Location, override val legTime: Hours, override val elapsedTime: Hours = 0) : EnRouteVehicleActivity() {
+        data class Returning(override val from: Location, override val to: Location, override val legTime: Hours, override val elapsedTime: Hours = 0) : EnRouteVehicleActivity {
             fun continueRoute(): Returning = copy(elapsedTime = elapsedTime.inc())
         }
     }
 
-    sealed class StationaryVehicleActivity : VehicleActivity() {
-        abstract val location: Location
+    sealed interface StationaryVehicleActivity : VehicleActivity {
+        val location: Location
 
-        data class WaitingForCargo(override val location: Location) : StationaryVehicleActivity()
-        data class WaitingToStartJourney(override val location: Location) : StationaryVehicleActivity()
+        data class WaitingForCargo(override val location: Location) : StationaryVehicleActivity
+        data class WaitingToStartJourney(override val location: Location) : StationaryVehicleActivity
 
     }
 }
