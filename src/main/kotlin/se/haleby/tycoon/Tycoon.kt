@@ -18,11 +18,8 @@ enum class Location {
     Factory, Port, WarehouseA, WarehouseB
 }
 
-sealed class VehicleType {
-    object Ship : VehicleType()
-    object Truck : VehicleType()
-
-    override fun toString(): String = this::class.simpleName!!
+enum class VehicleType {
+    Ship, Truck
 }
 
 data class Vehicle(val name: VehicleName, val type: VehicleType)
