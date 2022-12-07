@@ -66,11 +66,8 @@ class Fleet private constructor(internal val vehicleLocations: MutableMap<Vehicl
     }
 }
 
-sealed class Cargo {
-    object A : Cargo()
-    object B : Cargo()
-
-    override fun toString(): String = this::class.simpleName!!
+enum class Cargo {
+    A, B
 }
 
 class DeliveryPlan private constructor(internal val cargoDeliveries: MutableList<CargoDelivery>) {
@@ -121,16 +118,16 @@ fun deliverCargo(deliveryPlan: DeliveryPlan, fleet: Fleet, deliveryNetwork: Deli
     }
 
     val journeyAtStartOfDelivery = Journey(
-            fleetActivity = initialFleetActivity,
-            facilities = facilitiesWithStock,
-            deliveryPlan = deliveryPlan,
-            deliveryNetwork = deliveryNetwork
+        fleetActivity = initialFleetActivity,
+        facilities = facilitiesWithStock,
+        deliveryPlan = deliveryPlan,
+        deliveryNetwork = deliveryNetwork
     )
 
     return generateSequence(journeyAtStartOfDelivery, Journey::proceed)
-            .dropWhile { journey -> !journey.isCompleted() }
-            .first()
-            .history
+        .dropWhile { journey -> !journey.isCompleted() }
+        .first()
+        .history
 }
 
 // Internal
@@ -164,12 +161,14 @@ private sealed class VehicleActivity {
     }
 }
 
-private data class Journey(val fleetActivity: PersistentMap<Vehicle, VehicleActivity>,
-                           val elapsedTime: Hours = 0,
-                           val deliveryPlan: DeliveryPlan,
-                           val facilities: Facilities,
-                           val history: PersistentList<DomainEvent> = persistentListOf(),
-                           val deliveryNetwork: DeliveryNetwork) {
+private data class Journey(
+    val fleetActivity: PersistentMap<Vehicle, VehicleActivity>,
+    val elapsedTime: Hours = 0,
+    val deliveryPlan: DeliveryPlan,
+    val facilities: Facilities,
+    val history: PersistentList<DomainEvent> = persistentListOf(),
+    val deliveryNetwork: DeliveryNetwork
+) {
 
     fun proceed(): Journey {
         val journeyAfterAllVehiclesHaveMoved = fleetActivity.entries.fold(this) { currentJourney, (vehicle, currentActivity) ->
@@ -195,8 +194,11 @@ private data class Journey(val fleetActivity: PersistentMap<Vehicle, VehicleActi
             cargo == null ->
                 // Vehicle is currently not waiting for cargo (it has just arrived to the location) and since
                 // there's no cargo at this location the vehicle needs to wait for it to arrive before it can proceed.
-                copy(fleetActivity = fleetActivity.put(vehicle, WaitingForCargo(location)),
-                        history = history.add(VehicleStartedWaitingForCargo(vehicle, location)))
+                copy(
+                    fleetActivity = fleetActivity.put(vehicle, WaitingForCargo(location)),
+                    history = history.add(VehicleStartedWaitingForCargo(vehicle, location))
+                )
+
             else -> {
                 val (requiredVehicleType, from, to, duration) = deliveryNetwork.findRouteForCargo(cargo, deliveryPlan).findLeg { leg -> leg.from == location }!!
                 if (requiredVehicleType != vehicle.type) {
@@ -210,9 +212,11 @@ private data class Journey(val fleetActivity: PersistentMap<Vehicle, VehicleActi
                     events.add(CargoDeliveryStarted(cargo, from, deliveryPlan[cargo].to, elapsedTime))
                 }
                 events.add(VehicleDeparted(cargo, vehicle, from, to, elapsedTime, duration))
-                copy(fleetActivity = fleetActivity.put(vehicle, DeliveringCargo(cargo, from, to, duration)),
-                        history = history.addAll(events),
-                        facilities = facilities.loadCargo(from, cargo))
+                copy(
+                    fleetActivity = fleetActivity.put(vehicle, DeliveringCargo(cargo, from, to, duration)),
+                    history = history.addAll(events),
+                    facilities = facilities.loadCargo(from, cargo)
+                )
             }
         }
     }
@@ -232,14 +236,16 @@ private data class Journey(val fleetActivity: PersistentMap<Vehicle, VehicleActi
                     }
                 }
                 val newVehicleActivity = Returning(from = vehicleActivity.to, to = vehicleActivity.from, legTime = vehicleActivity.legTime)
-                copy(fleetActivity = fleetActivity.put(vehicle, newVehicleActivity),
-                        history = history.addAll(deliveringCargoEvents),
-                        facilities = facilities.unloadCargo(currentLocation, cargo)
+                copy(
+                    fleetActivity = fleetActivity.put(vehicle, newVehicleActivity),
+                    history = history.addAll(deliveringCargoEvents),
+                    facilities = facilities.unloadCargo(currentLocation, cargo)
                 )
             } else {
                 copy(fleetActivity = fleetActivity.put(vehicle, vehicleActivityAfterRouteWasContinued))
             }
         }
+
         is Returning -> {
             val vehicleActivityAfterMove = vehicleActivity.continueRoute()
             if (vehicleActivityAfterMove.hasArrived()) {
